@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en" ng-app="booksApp">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Books Order</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+    <script src="app.js" defer></script>
+</head>
+<body class="theme-dark">
+    <header class="container">
+        <h1>Books Order</h1>
+        <nav class="nav">
+            <a href="#/orders" class="nav__link" ng-if="auth.isAuthenticated() && auth.user().role === 'user'" ng-class="{ 'nav__link--active': location.path() === '/orders' }">My Orders</a>
+            <span class="spacer"></span>
+            <a href="#/login" class="nav__link" ng-if="!auth.isAuthenticated()" ng-class="{ 'nav__link--active': location.path() === '/login' }">Login</a>
+            <a href="#/register" class="nav__link" ng-if="!auth.isAuthenticated()" ng-class="{ 'nav__link--active': location.path() === '/register' }">Register</a>
+            <span class="nav__user" ng-if="auth.isAuthenticated()">{{ auth.user().name }} ({{ auth.user().role }})</span>
+            <button class="btn" ng-if="auth.isAuthenticated()" ng-click="auth.logout()">Logout</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div ng-view></div>
+    </main>
+
+    <footer class="container muted">API: http://localhost:4000</footer>
+    
+    <!-- Inline AngularJS templates so routing works when opened from file:// -->
+    <script type="text/ng-template" id="user.tpl">
+<div ng-controller="BooksController as vm" class="grid">
+  <section class="panel">
+    <h2>Available Indian Books</h2>
+    <div class="books">
+      <div class="book" ng-repeat="b in vm.books">
+        <div class="book__title">{{ b.title }}</div>
+        <div class="book__author">{{ b.author }}</div>
+        <div class="book__price">₹{{ (b.price * 83) | number:2 }}</div>
+        <button class="btn" ng-click="vm.addToCart(b)">Add to cart</button>
+      </div>
+    </div>
+    <div class="empty" ng-if="!vm.loading && vm.books.length === 0">No books found.</div>
+    <div class="loading" ng-if="vm.loading">Loading books…</div>
+    <div class="error" ng-if="vm.error">{{ vm.error }}</div>
+  </section>
+
+  <section class="panel">
+    <h2>Your Cart</h2>
+    <div class="empty" ng-if="vm.cart.length === 0">Your cart is empty.</div>
+    <table class="cart" ng-if="vm.cart.length">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in vm.cart">
+          <td>{{ item.title }}</td>
+          <td>₹{{ (item.price * 83) | number:2 }}</td>
+          <td>
+            <input type="number" min="1" ng-model="item.quantity" ng-change="vm.recalculate()" />
+          </td>
+          <td>₹{{ ((item.price * 83) * item.quantity) | number:2 }}</td>
+          <td><button class="btn btn--link" ng-click="vm.removeFromCart(item)">Remove</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="right">Total</td>
+          <td colspan="2" class="bold">₹{{ (vm.total * 83) | number:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <form class="order-form" ng-if="vm.cart.length" ng-submit="vm.placeOrder()" novalidate>
+      <h3>Customer</h3>
+      <label>
+        <span>Name</span>
+        <input type="text" ng-model="vm.customer.name" required />
+      </label>
+      <label>
+        <span>Email</span>
+        <input type="email" ng-model="vm.customer.email" required />
+      </label>
+      <button class="btn" type="submit" ng-disabled="vm.placing">{{ vm.placing ? 'Placing…' : 'Place Order' }}</button>
+      <div class="success" ng-if="vm.success">Order placed! ID: {{ vm.success._id }}</div>
+      <div class="error" ng-if="vm.submitError">{{ vm.submitError }}</div>
+    </form>
+  </section>
+</div>
+    </script>
+
+    <script type="text/ng-template" id="admin.tpl">
+<div ng-controller="AdminController as am" class="panel">
+  <h2>Admin Dashboard</h2>
+  <div class="muted">Recent Orders</div>
+  <div class="empty" ng-if="!am.loading && am.orders.length === 0">No orders yet.</div>
+  <div class="loading" ng-if="am.loading">Loading orders…</div>
+  <div class="error" ng-if="am.error">{{ am.error }}</div>
+
+  <table class="cart" ng-if="am.orders.length">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Items</th>
+        <th>Total (₹)</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="o in am.orders">
+        <td>{{ o._id }}</td>
+        <td>{{ o.customerName }}</td>
+        <td>{{ o.customerEmail }}</td>
+        <td>
+          <div ng-repeat="i in o.items">{{ i.title }} x {{ i.quantity }}</div>
+        </td>
+        <td>{{ (o.total * 83) | number:2 }}</td>
+        <td><span class="badge">{{ o.status }}</span></td>
+        <td>{{ o.createdAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 style="margin-top:16px">Books Management</h3>
+  <form class="order-form" ng-submit="am.addBook()" novalidate style="max-width:600px">
+    <label>
+      <span>Title</span>
+      <input type="text" ng-model="am.newBook.title" required />
+    </label>
+    <label>
+      <span>Author</span>
+      <input type="text" ng-model="am.newBook.author" required />
+    </label>
+    <label>
+      <span>Price (₹ INR)</span>
+      <input type="number" min="0" step="0.01" ng-model="am.newBook.priceInr" required />
+    </label>
+    <label>
+      <span>Image URL</span>
+      <input type="url" ng-model="am.newBook.imageUrl" placeholder="https://..." />
+    </label>
+    <button class="btn" type="submit" ng-disabled="am.adding">{{ am.adding ? 'Adding…' : 'Add Book' }}</button>
+    <div class="error" ng-if="am.bookError">{{ am.bookError }}</div>
+    <div class="success" ng-if="am.bookSuccess">Book added</div>
+  </form>
+  <div class="muted" style="margin-top:8px">Newly added books appear immediately for users.</div>
+</div>
+    </script>
+
+    <script type="text/ng-template" id="login.tpl">
+<div ng-controller="LoginController as lg" class="panel" style="max-width:480px;margin:0 auto;">
+  <h2>Login</h2>
+  <form class="order-form" ng-submit="lg.login()" novalidate>
+    <label>
+      <span>Email</span>
+      <input type="email" ng-model="lg.email" required />
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" ng-model="lg.password" required />
+    </label>
+    <button class="btn" type="submit" ng-disabled="lg.loading">{{ lg.loading ? 'Signing in…' : 'Login' }}</button>
+    <div class="error" ng-if="lg.error">{{ lg.error }}</div>
+    <div class="muted" style="margin-top:8px">Default admin: admin@example.com / admin123</div>
+  </form>
+</div>
+    </script>
+
+    <script type="text/ng-template" id="register.tpl">
+<div ng-controller="RegisterController as rg" class="panel" style="max-width:480px;margin:0 auto;">
+  <h2>Register</h2>
+  <form class="order-form" ng-submit="rg.register()" novalidate>
+    <label>
+      <span>Name</span>
+      <input type="text" ng-model="rg.name" required />
+    </label>
+    <label>
+      <span>Email</span>
+      <input type="email" ng-model="rg.email" required />
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" ng-model="rg.password" required />
+    </label>
+    <button class="btn" type="submit" ng-disabled="rg.loading">{{ rg.loading ? 'Creating…' : 'Register' }}</button>
+    <div class="error" ng-if="rg.error">{{ rg.error }}</div>
+  </form>
+</div>
+    </script>
+
+    <script type="text/ng-template" id="myorders.tpl">
+<div ng-controller="MyOrdersController as mo" class="panel">
+  <h2>My Orders</h2>
+  <div class="empty" ng-if="!mo.loading && mo.orders.length === 0">No orders yet.</div>
+  <div class="loading" ng-if="mo.loading">Loading…</div>
+  <div class="error" ng-if="mo.error">{{ mo.error }}</div>
+  <table class="cart" ng-if="mo.orders.length">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Items</th>
+        <th>Total (₹)</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="o in mo.orders">
+        <td>{{ o._id }}</td>
+        <td>
+          <div ng-repeat="i in o.items">{{ i.title }} x {{ i.quantity }}</div>
+        </td>
+        <td>{{ (o.total * 83) | number:2 }}</td>
+        <td><span class="badge">{{ o.status }}</span></td>
+        <td>{{ o.createdAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    </script>
+
+    <script>
+      // Simple helper to expose $location to header for active nav classes
+      (function(){
+        var el = document.querySelector('body');
+        angular.element(function(){
+          var $injector = angular.element(el).injector();
+          if ($injector) {
+            var $rootScope = $injector.get('$rootScope');
+            var $location = $injector.get('$location');
+            $rootScope.location = $location;
+          }
+        });
+      })();
+    </script>
+</body>
+</html>
+
+

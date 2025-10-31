@@ -1,0 +1,66 @@
+<div ng-controller="BooksController as vm" class="grid">
+  <section class="panel">
+    <h2>Available Indian Books</h2>
+    <div class="books">
+      <div class="book" ng-repeat="b in vm.books">
+        <div class="book__title">{{ b.title }}</div>
+        <div class="book__author">{{ b.author }}</div>
+        <div class="book__price">₹{{ (b.price * 83) | number:2 }}</div>
+        <button class="btn" ng-click="vm.addToCart(b)">Add to cart</button>
+      </div>
+    </div>
+    <div class="empty" ng-if="!vm.loading && vm.books.length === 0">No books found.</div>
+    <div class="loading" ng-if="vm.loading">Loading books…</div>
+    <div class="error" ng-if="vm.error">{{ vm.error }}</div>
+  </section>
+
+  <section class="panel">
+    <h2>Your Cart</h2>
+    <div class="empty" ng-if="vm.cart.length === 0">Your cart is empty.</div>
+    <table class="cart" ng-if="vm.cart.length">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in vm.cart">
+          <td>{{ item.title }}</td>
+          <td>₹{{ (item.price * 83) | number:2 }}</td>
+          <td>
+            <input type="number" min="1" ng-model="item.quantity" ng-change="vm.recalculate()" />
+          </td>
+          <td>₹{{ ((item.price * 83) * item.quantity) | number:2 }}</td>
+          <td><button class="btn btn--link" ng-click="vm.removeFromCart(item)">Remove</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="right">Total</td>
+          <td colspan="2" class="bold">₹{{ (vm.total * 83) | number:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <form class="order-form" ng-if="vm.cart.length" ng-submit="vm.placeOrder()" novalidate>
+      <h3>Customer</h3>
+      <label>
+        <span>Name</span>
+        <input type="text" ng-model="vm.customer.name" required />
+      </label>
+      <label>
+        <span>Email</span>
+        <input type="email" ng-model="vm.customer.email" required />
+      </label>
+      <button class="btn" type="submit" ng-disabled="vm.placing">{{ vm.placing ? 'Placing…' : 'Place Order' }}</button>
+      <div class="success" ng-if="vm.success">Order placed! ID: {{ vm.success._id }}</div>
+      <div class="error" ng-if="vm.submitError">{{ vm.submitError }}</div>
+    </form>
+  </section>
+</div>
+
+

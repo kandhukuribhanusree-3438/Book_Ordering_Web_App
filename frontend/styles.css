@@ -1,0 +1,73 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+/* Theme defaults */
+body.theme-light { color: #1f2937; background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); }
+body.theme-dark { color: #ffffff; background: radial-gradient(1200px 600px at 10% -10%, #111827 0%, #0b1220 60%, #060914 100%); }
+.theme-light .panel { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.theme-dark .panel { background: #0f172a; border: 1px solid #1f2937; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.panel { border-radius: 8px; padding: 16px; }
+h1 { margin: 12px 0 8px; }
+h2 { margin: 0 0 12px; }
+h3 { margin: 16px 0 8px; }
+.books { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.theme-light .book { border: 1px solid #e5e7eb; background: #ffffff; }
+.theme-dark .book { border: 1px solid #1f2937; background: #111827; }
+.book { border-radius: 8px; padding: 12px; }
+.book__img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+.book__title { font-weight: 600; }
+.theme-light .book__author { color: #6b7280; }
+.theme-dark .book__author { color: #9ca3af; }
+.book__author { font-size: 14px; margin: 4px 0 8px; }
+.book__price { margin-bottom: 8px; }
+.btn { background: #2563eb; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+.theme-dark .btn { background: linear-gradient(135deg, #2563eb, #7c3aed); box-shadow: 0 4px 14px rgba(124,58,237,0.3); }
+.theme-dark .btn:hover { filter: brightness(1.05); }
+.theme-light .btn:hover { background: #1d4ed8; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn--link { background: transparent; color: #2563eb; padding: 0; }
+.cart { width: 100%; border-collapse: collapse; }
+.theme-light .cart th, .theme-light .cart td { border-top: 1px solid #e5e7eb; }
+.theme-dark .cart th, .theme-dark .cart td { border-top: 1px solid #1f2937; color: #e5e7eb; }
+.cart th, .cart td { padding: 8px; }
+.theme-light .cart input[type="number"] { background: #fff; color: #1f2937; border: 1px solid #e5e7eb; }
+.theme-dark .cart input[type="number"] { background: #0f172a; color: #e5e7eb; border: 1px solid #1f2937; }
+.cart input[type="number"] { width: 72px; padding: 4px; border-radius: 6px; }
+.right { text-align: right; }
+.bold { font-weight: 700; }
+.theme-light .empty { color: #6b7280; }
+.theme-light .loading { color: #2563eb; }
+.theme-light .error { color: #b91c1c; }
+.theme-light .success { color: #166534; }
+.theme-dark .empty { color: #9ca3af; }
+.theme-dark .loading { color: #93c5fd; }
+.theme-dark .error { color: #fecaca; }
+.theme-dark .success { color: #bbf7d0; }
+.error, .success { margin-top: 8px; }
+.order-form { margin-top: 16px; display: grid; gap: 8px; }
+.order-form label { display: grid; gap: 4px; }
+.theme-light .order-form input { padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; background: #ffffff; color: #1f2937; }
+.theme-dark .order-form input { padding: 8px; border: 1px solid #1f2937; border-radius: 6px; background: #0f172a; color: #e5e7eb; }
+.theme-light .muted { color: #6b7280; }
+.theme-dark .muted { color: #9ca3af; }
+.muted { font-size: 12px; }
+/* Navigation */
+.nav { display: flex; gap: 12px; margin-top: 8px; align-items: center; }
+.theme-light .nav__link { color: #111827; }
+.theme-light .nav__link:hover { background: #f3f4f6; }
+.theme-light .nav__link--active { background: #eef2ff; border-color: #c7d2fe; color: #1e3a8a; }
+.theme-dark .nav__link { color: #ffffff; }
+.theme-dark .nav__link:hover { background: #111827; }
+.theme-dark .nav__link--active { background: #111827; border-color: #374151; color: #c7d2fe; }
+.	spacer { flex: 1; }
+.theme-light .nav__user { color: #374151; }
+.theme-dark .nav__user { color: #ffffff; }
+/* Badges */
+.badge { background: #eef2ff; color: #3730a3; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .books { grid-template-columns: 1fr; }
+}
+
+

@@ -1,0 +1,42 @@
+<div ng-controller="AdminController as am" class="panel">
+  <h2>Admin Dashboard</h2>
+  <div class="muted">Recent Orders</div>
+  <div class="empty" ng-if="!am.loading && am.orders.length === 0">No orders yet.</div>
+  <div class="loading" ng-if="am.loading">Loading orders…</div>
+  <div class="error" ng-if="am.error">{{ am.error }}</div>
+
+  <table class="cart" ng-if="am.orders.length">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Items</th>
+        <th>Total (₹)</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="o in am.orders">
+        <td>{{ o._id }}</td>
+        <td>{{ o.customerName }}</td>
+        <td>{{ o.customerEmail }}</td>
+        <td>
+          <div ng-repeat="i in o.items">{{ i.title }} x {{ i.quantity }}</div>
+        </td>
+        <td>{{ (o.total * 83) | number:2 }}</td>
+        <td>
+          <select ng-model="o.status" ng-change="am.updateStatus(o, o.status)" ng-disabled="am.saving[o._id]">
+            <option value="created">created</option>
+            <option value="paid">paid</option>
+            <option value="shipped">shipped</option>
+          </select>
+        </td>
+        <td>{{ o.createdAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
