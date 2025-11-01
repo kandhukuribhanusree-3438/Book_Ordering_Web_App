@@ -1,7 +1,9 @@
 (function() {
   'use strict';
 
-  const API_BASE = (window.API_BASE || 'http://localhost:4000') + '/api';
+  // Use relative API path in production, absolute in development
+  const apiBase = window.API_BASE || '';
+  const API_BASE = apiBase ? apiBase + '/api' : '/api';
 
   angular.module('booksApp', ['ngRoute'])
     .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {

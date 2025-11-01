@@ -8,17 +8,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
     <script>
-      // Set API_BASE from environment variable or default to localhost for development
-      // In Vercel, set VERCEL_URL or NEXT_PUBLIC_API_URL environment variable
+      // Set API_BASE - use relative path for Vercel deployment, absolute for local dev
+      // When deployed on Vercel, API is at the same domain (/api)
+      // For local development, use localhost
       window.API_BASE = window.API_BASE || (function() {
-        // Check for Vercel environment or custom API URL
-        if (typeof window !== 'undefined') {
-          // Try to get from meta tag (can be set by Vercel build)
-          var meta = document.querySelector('meta[name="api-base"]');
-          if (meta && meta.content) return meta.content;
+        // Check if we're in development (localhost)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          return 'http://localhost:4000';
         }
-        // Default to localhost for local development
-        return 'http://localhost:4000';
+        // Production: use relative path (same domain)
+        return '';
       })();
     </script>
     <script src="app.js" defer></script>
