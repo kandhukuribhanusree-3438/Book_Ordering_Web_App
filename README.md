@@ -4,7 +4,7 @@ A minimal Books Order page with an Express + MongoDB backend and an AngularJS (1
 
 ## Prerequisites
 - Node.js 18+
-- MongoDB running locally (or provide a connection string)
+- MongoDB Atlas account (already configured with connection string)
 
 ## Backend Setup
 1. Install dependencies:
@@ -19,11 +19,16 @@ npm install
 ```bash
 # backend/.env
 PORT=4000
-MONGODB_URI=mongodb://127.0.0.1:27017/mean_books
+# MongoDB Atlas connection string (default is already configured)
+MONGODB_URI=mongodb+srv://bhanusreekandhukuri03_db_user:Bhanu123@cluster0.ylqlqef.mongodb.net/?appName=Cluster0
 MONGODB_DB=mean_books
 # Allow multiple origins separated by comma (omit to allow all)
 CORS_ORIGIN=http://localhost:4000,http://127.0.0.1:4000
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin123
 ```
+
+**Note**: The app is configured to use MongoDB Atlas by default. The connection string is already set in the code, but you can override it using the `MONGODB_URI` environment variable.
 
 3. Start the API:
 
@@ -49,5 +54,10 @@ Static AngularJS app; no build required.
 
 ## Notes
 - CORS is enabled. Configure allowed origins with `CORS_ORIGIN`.
-- Books list is in-memory at `backend/src/routes/books.js`. Move to MongoDB as needed.
+- Books are stored in MongoDB Atlas (already configured).
 - Use `npm run dev` for watch mode on Node 18+.
+- For Vercel deployment, see `VERCEL_DEPLOYMENT.md`.
+
+## Deployment
+
+This app is configured for MongoDB Atlas and ready for deployment. See `VERCEL_DEPLOYMENT.md` for detailed deployment instructions.
